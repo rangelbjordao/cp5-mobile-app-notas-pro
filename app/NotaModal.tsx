@@ -18,8 +18,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../services/firebaseConfig";
-import { COLORS } from "../constants/colors";
+import { auth, db } from "../src/services/firebaseConfig";
+import { COLORS } from "../src/constants/colors";
+import { useTranslation } from "react-i18next";
 
 type Nota = {
   id: string;
@@ -39,6 +40,8 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
   const [conteudo, setConteudo] = useState("");
   const [salvando, setSalvando] = useState(false);
 
+  const { t } = useTranslation();
+
   const editando = !!notaExistente;
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
   const handleSalvar = async () => {
     if (!titulo.trim()) {
-      Alert.alert("Atenção", "O título não pode estar vazio.");
+      Alert.alert(t("attention"), t("field_required"));
       return;
     }
 
@@ -78,7 +81,7 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
       onFechar();
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível salvar a nota.");
+      Alert.alert(t("attention"), t("save_error"));
     } finally {
       setSalvando(false);
     }
@@ -97,8 +100,10 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titulo}>
-              {editando ? "Editar Nota" : "Nova Nota"}
+            <Text
+              style={styles.titulo}
+            >
+              {editando ? t("modal_edit") : t("modal_new")}
             </Text>
             <TouchableOpacity onPress={onFechar}>
               <Text style={styles.fechar}>✕</Text>
@@ -107,7 +112,7 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
           <TextInput
             style={styles.input}
-            placeholder="Título"
+            placeholder={t("modal_title")}
             placeholderTextColor="#aaa"
             value={titulo}
             onChangeText={setTitulo}
@@ -116,7 +121,7 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
           <TextInput
             style={[styles.input, styles.inputConteudo]}
-            placeholder="Escreva sua nota..."
+            placeholder={t("modal_content")}
             placeholderTextColor="#aaa"
             value={conteudo}
             onChangeText={setConteudo}
@@ -133,7 +138,7 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
               <ActivityIndicator color="#fff" />
             ) : (
               <Text style={styles.textoBotao}>
-                {editando ? "Salvar alterações" : "Criar nota"}
+                {editando ? t("btn_save") : t("btn_create")}
               </Text>
             )}
           </TouchableOpacity>

@@ -10,9 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../services/firebaseConfig";
-import { criarPerfilUsuario } from "../services/userDataService";
-import { COLORS } from "../constants/colors";
+import { auth } from "../src/services/firebaseConfig";
+import { criarPerfilUsuario } from "../src/services/userDataService";
+import { COLORS } from "../src/constants/colors";
+import { useTranslation } from "react-i18next";
 
 export default function CadastroScreen() {
   // Estados para armazenar os valores digitados
@@ -22,10 +23,12 @@ export default function CadastroScreen() {
 
   const router = useRouter(); //Hook de navegação
 
+  const { t } = useTranslation()
+
   // Função para simular o envio do formulário
   const handleCadastro = () => {
     if (!nome || !email || !senha) {
-      Alert.alert("Atenção", "Preencha todos os campos!");
+      Alert.alert(t("attention"), t("fill_fields"));
       return;
     }
     createUserWithEmailAndPassword(auth, email, senha)
@@ -49,16 +52,13 @@ export default function CadastroScreen() {
         console.log(errorCode + " " + errorMessage);
 
         if (errorCode === "auth/email-already-in-use") {
-          Alert.alert("Atenção", "Este e-mail já está em uso.");
+          Alert.alert(t("attention"), t("email_in_use"));
         } else if (errorCode === "auth/weak-password") {
-          Alert.alert("Atenção", "A senha deve ter pelo menos 6 caracteres.");
+          Alert.alert(t("attention"), t("weak_password"));
         } else if (errorCode === "auth/invalid-email") {
-          Alert.alert("Atenção", "E-mail inválido.");
+          Alert.alert(t("attention"), t("invalid_email"));
         } else {
-          Alert.alert(
-            "Erro",
-            "Não foi possível criar a conta. Tente novamente.",
-          );
+          Alert.alert(t("generic_error"), t("generic_signup_error"));
         }
       });
   };
@@ -66,23 +66,21 @@ export default function CadastroScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.titulo}>Criar Conta</Text>
-        <Text style={styles.subtitulo}>
-          Preencha os dados para se cadastrar
-        </Text>
+        <Text style={styles.titulo}>{t("signup_title")}</Text>
+        <Text style={styles.subtitulo}>{t("login_sub")}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Nome completo"
-          placeholderTextColor={COLORS.placeholder}
+          placeholder={t("name_placeholder")}
+          placeholderTextColor="#aaa"
           value={nome}
           onChangeText={setNome}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor={COLORS.placeholder}
+          placeholder={t("email")}
+          placeholderTextColor="#aaa"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -91,19 +89,19 @@ export default function CadastroScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor={COLORS.placeholder}
+          placeholder={t("password")}
+          placeholderTextColor="#aaa"
           secureTextEntry
           value={senha}
           onChangeText={setSenha}
         />
 
         <TouchableOpacity style={styles.botao} onPress={handleCadastro}>
-          <Text style={styles.textoBotao}>Cadastrar</Text>
+          <Text style={styles.textoBotao}>{t("register")}</Text>
         </TouchableOpacity>
 
         <Link href="/" style={styles.linkLogin}>
-          Já tem conta? Entrar
+          {t("already_have_account")}
         </Link>
       </View>
     </View>

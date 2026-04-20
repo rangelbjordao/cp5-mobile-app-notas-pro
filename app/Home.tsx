@@ -15,15 +15,17 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../services/firebaseConfig";
+import { auth, db } from "../src/services/firebaseConfig";
 import NotaModal from "./NotaModal";
-import { COLORS } from "../constants/colors";
+import { COLORS } from "../src/constants/colors";
+import { useTranslation } from "react-i18next";
 
 type Nota = {
   id: string;
@@ -40,14 +42,16 @@ const Home = () => {
 
   const router = useRouter();
 
+  const { t, i18n } = useTranslation()
+
   const { novoCadastro } = useLocalSearchParams();
 
   // Mensagem ao criar nova conta
   useEffect(() => {
     if (novoCadastro === "true") {
-      Alert.alert("Bem-vindo!", "Sua conta foi criada com sucesso!");
+      Alert.alert(t("welcome_alert"), t("success_alert"));
     }
-  }, []);
+  }, [novoCadastro]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -93,9 +97,9 @@ const Home = () => {
   };
 
   const confirmarDeletar = (id: string) => {
-    Alert.alert("Deletar nota", "Tem certeza que deseja deletar esta nota?", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Deletar", style: "destructive", onPress: () => deletarNota(id) },
+    Alert.alert(t("delete_note_title"), t("delete_note_message"), [
+      { text: t("cancel"), style: "cancel" },
+      { text: t("delete"), style: "destructive", onPress: () => deletarNota(id) },
     ]);
   };
 
@@ -103,7 +107,7 @@ const Home = () => {
     try {
       await deleteDoc(doc(db, "notas", id));
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível deletar a nota.");
+      Alert.alert(t("generic_error"), t("delete_error"));
     }
   };
 
@@ -132,9 +136,9 @@ const Home = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titulo}>Minhas Notas</Text>
+        <Text style={styles.titulo}>{t("home_title")}</Text>
         <TouchableOpacity onPress={realizarLogout}>
-          <Text style={styles.logout}>Sair</Text>
+          <Text style={styles.logout}>{t("logout")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -146,10 +150,8 @@ const Home = () => {
         />
       ) : notas.length === 0 ? (
         <View style={styles.vazio}>
-          <Text style={styles.vazioTexto}>Nenhuma nota ainda.</Text>
-          <Text style={styles.vazioSubtitulo}>
-            Toque em "+" para criar uma nota.
-          </Text>
+          <Text style={styles.vazioTexto}>{t("empty_list_title")}</Text>
+          <Text style={styles.vazioSubtitulo}>{t("empty_list_subtitle")}</Text>
         </View>
       ) : (
         <FlatList
@@ -276,5 +278,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.subtitulo,
     marginTop: 6,
+  },
+  idiomaContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 20,
+  },
+  langActive: {
+    fontWeight: "bold",
+    color: COLORS.primary,
+    fontSize: 16,
+  },
+  langInactive: {
+    color: COLORS.subtitulo,
+    fontSize: 16,
   },
 });

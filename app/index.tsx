@@ -4,21 +4,25 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../services/firebaseConfig";
-import { registrarUltimoLogin } from "../services/userDataService";
-import { COLORS } from "../constants/colors";
+import { auth } from "../src/services/firebaseConfig";
+import { registrarUltimoLogin } from "../src/services/userDataService";
+import { COLORS } from "../src/constants/colors";
+import { useTranslation } from "react-i18next";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   const router = useRouter();
+
+  const { t, i18n } = useTranslation()
 
   //Verifica se há persistência no Async Storage
   useEffect(() => {
@@ -38,7 +42,7 @@ const LoginScreen = () => {
   // Função para simular o envio do formulário
   const handleLogin = () => {
     if (!email || !senha) {
-      Alert.alert("Atenção", "Preencha todos os campos!");
+      Alert.alert(t("attention"), t("fill_fields"));
       return;
     }
     signInWithEmailAndPassword(auth, email, senha)
@@ -58,18 +62,23 @@ const LoginScreen = () => {
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
         Alert.alert(
-          "ATENÇÃO",
-          "Credenciais Inválidas, verifique e-mail e senha:",
+          t("attention"),
+          t("invalid_credentials"),
           [{ text: "OK" }],
         );
       });
   };
 
+  //Função para alterar o idioma
+  const mudarIdioma = (lang: string) => {
+    i18n.changeLanguage(lang)
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.titulo}>Bem-vindo</Text>
-        <Text style={styles.subtitulo}>Faça login para continuar</Text>
+        <Text style={styles.titulo}>{t("welcome")}</Text>
+        <Text style={styles.subtitulo}>{t("login_sub")}</Text>
 
         <TextInput
           style={styles.input}
@@ -83,7 +92,7 @@ const LoginScreen = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="Senha"
+          placeholder={t("password")}
           placeholderTextColor={COLORS.placeholder}
           secureTextEntry
           value={senha}
@@ -91,12 +100,38 @@ const LoginScreen = () => {
         />
 
         <TouchableOpacity style={styles.botao} onPress={handleLogin}>
-          <Text style={styles.textoBotao}>Entrar</Text>
+          <Text style={styles.textoBotao}>{t("login_btn")}</Text>
         </TouchableOpacity>
 
         <Link href="/CadastrarScreen" style={styles.linkCadastrar}>
-          Não tem conta? Criar agora
+          {t("link_signup")}
         </Link>
+      </View>
+
+      <View style={{ alignItems: "center", marginTop: 30 }}>
+        <Text style={{ fontSize: 20 }}>{t("chooselanguage")}</Text>
+      </View>
+
+      <View style={styles.idiomaContainer}>
+        <TouchableOpacity onPress={() => mudarIdioma("pt")}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Text style={i18n.language === "pt" ? styles.langActive : styles.langInactive}>PT</Text>
+            <Image
+              source={require("../assets/brasil.png")}
+              style={{ width: 30, height: 30 }}
+            />
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => mudarIdioma("en")}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Text style={i18n.language === "en" ? styles.langActive : styles.langInactive}>EN</Text>
+            <Image
+              source={require("../assets/usa.png")}
+              style={{ width: 30, height: 30 }}
+            />
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -160,5 +195,20 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 15,
     fontWeight: "400",
+  },
+  idiomaContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 20,
+  },
+  langActive: {
+    fontWeight: "bold",
+    color: COLORS.primary,
+    fontSize: 16,
+  },
+  langInactive: {
+    color: COLORS.subtitulo,
+    fontSize: 16,
   },
 });
