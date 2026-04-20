@@ -6,12 +6,12 @@ import { addDoc, collection, getFirestore } from "firebase/firestore";
 const { getReactNativePersistence } = require("firebase/auth") as any;
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCCom_J5NkQG9JblPXXZsMsU302qA7Iwck",
-  authDomain: "cp4-mobile-app-notas-9dca2.firebaseapp.com",
-  projectId: "cp4-mobile-app-notas-9dca2",
-  storageBucket: "cp4-mobile-app-notas-9dca2.firebasestorage.app",
-  messagingSenderId: "654395996449",
-  appId: "1:654395996449:web:7e0942904c188a1c9ea660",
+  apiKey: "AIzaSyDAeXw_ffiJ64SDqSA65a64u0XxBxWIDXA",
+  authDomain: "appnotaspro.firebaseapp.com",
+  projectId: "appnotaspro",
+  storageBucket: "appnotaspro.firebasestorage.app",
+  messagingSenderId: "132741489282",
+  appId: "1:132741489282:web:36bb6afebe4732b6de8a9b"
 };
 
 // Initialize Firebase
