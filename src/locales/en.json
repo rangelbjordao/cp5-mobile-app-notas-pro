@@ -36,5 +36,8 @@
   "delete": "Delete",
   "delete_error": "Could not delete the note.",
   "empty_list_title": "No notes yet.",
-  "empty_list_subtitle": "Tap \"+\" to create a note."
+  "empty_list_subtitle": "Tap \"+\" to create a note.",
+  "location_permission_denied": "Location permission denied",
+  "location_error": "Could not get your location.",
+  "view_map": "View Location"
 }

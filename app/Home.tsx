@@ -11,26 +11,28 @@ import {
   where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../src/services/firebaseConfig";
-import NotaModal from "./NotaModal";
+import NotaModal from "../src/components/NotaModal";
 import { COLORS } from "../src/constants/colors";
-import { useTranslation } from "react-i18next";
+import { auth, db } from "../src/services/firebaseConfig";
+import MapaModal from "../src/components/MapaModal";
+import { Ionicons } from '@expo/vector-icons';
 
 type Nota = {
   id: string;
   titulo: string;
   conteudo: string;
+  localizacao?: { latitude: number; longitude: number };
   criadoEm: any;
 };
 
@@ -39,11 +41,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [notaSelecionada, setNotaSelecionada] = useState<Nota | null>(null);
+  const [mapaVisivel, setMapaVisivel] = useState(false);
 
   const router = useRouter();
-
-  const { t, i18n } = useTranslation()
-
+  const { t } = useTranslation()
   const { novoCadastro } = useLocalSearchParams();
 
   // Mensagem ao criar nova conta
@@ -96,6 +97,11 @@ const Home = () => {
     setModalVisivel(true);
   };
 
+  const abrirMapa = (nota: Nota) => {
+    setNotaSelecionada(nota);
+    setMapaVisivel(true);
+  };
+
   const confirmarDeletar = (id: string) => {
     Alert.alert(t("delete_note_title"), t("delete_note_message"), [
       { text: t("cancel"), style: "cancel" },
@@ -123,6 +129,18 @@ const Home = () => {
         <Text style={styles.cardConteudo} numberOfLines={2}>
           {item.conteudo}
         </Text>
+
+        {item.localizacao && (
+          <TouchableOpacity
+            onPress={() => abrirMapa(item)}
+            style={styles.localizacaoBotao}
+          >
+            <Ionicons name="location-sharp" size={16} color={COLORS.primary} />
+            <Text style={styles.localizacaoTexto}>
+              {t("view_map")}
+            </Text>
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.botaoDeletar}
@@ -169,6 +187,17 @@ const Home = () => {
       >
         <Text style={styles.botaoCriarTexto}>+</Text>
       </TouchableOpacity>
+
+
+      <MapaModal
+        visivel={mapaVisivel}
+        onFechar={() => {
+          setMapaVisivel(false);
+          setNotaSelecionada(null);
+        }}
+        localizacao={notaSelecionada?.localizacao || null}
+        tituloNota={notaSelecionada?.titulo}
+      />
 
       <NotaModal
         visivel={modalVisivel}
@@ -294,4 +323,16 @@ const styles = StyleSheet.create({
     color: COLORS.subtitulo,
     fontSize: 16,
   },
+  localizacaoBotao: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start'
+  },
+  localizacaoTexto: {
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 4,
+  }
 });

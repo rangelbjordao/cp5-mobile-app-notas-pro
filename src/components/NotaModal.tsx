@@ -18,14 +18,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../src/services/firebaseConfig";
-import { COLORS } from "../src/constants/colors";
+import { auth, db } from "../services/firebaseConfig";
+import { COLORS } from "../constants/colors";
 import { useTranslation } from "react-i18next";
+import * as Location from "expo-location";
 
 type Nota = {
   id: string;
   titulo: string;
   conteudo: string;
+  localizacao?: { latitude: number; longitude: number };
   criadoEm: any;
 };
 
@@ -65,22 +67,48 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
       const user = auth.currentUser;
       if (!user) return;
 
+      let localizacao = null;
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status === "granted") {
+        try {
+          const location = await Location.getCurrentPositionAsync({});
+          localizacao = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          };
+        } catch (err) {
+          console.log("Erro ao obter posição", err);
+          Alert.alert(t("attention"), t("location_error"));
+        }
+      } else {
+        Alert.alert(t("attention"), t("location_permission_denied"));
+      }
+
+      const dadosNota: any = {
+        titulo: titulo.trim(),
+        conteudo: conteudo.trim(),
+      };
+
+
+      if (localizacao) {
+        dadosNota.localizacao = localizacao;
+      }
+
       if (editando && notaExistente) {
-        await updateDoc(doc(db, "notas", notaExistente.id), {
-          titulo: titulo.trim(),
-          conteudo: conteudo.trim(),
-        });
+        await updateDoc(doc(db, "notas", notaExistente.id), dadosNota);
       } else {
         await addDoc(collection(db, "notas"), {
+          ...dadosNota,
           uid: user.uid,
-          titulo: titulo.trim(),
-          conteudo: conteudo.trim(),
           criadoEm: serverTimestamp(),
         });
       }
 
       onFechar();
     } catch (error) {
+      console.error("Erro ao salvar nota:", error);
       Alert.alert(t("attention"), t("save_error"));
     } finally {
       setSalvando(false);
@@ -180,7 +208,7 @@ const styles = StyleSheet.create({
   },
   fechar: {
     fontSize: 20,
-    color: COLORS.subtitulo,
+    color: COLORS.primary,
   },
   input: {
     backgroundColor: "#F9FAFB",

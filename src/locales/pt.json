@@ -36,5 +36,8 @@
   "delete": "Deletar",
   "delete_error": "Não foi possível deletar a nota.",
   "empty_list_title": "Nenhuma nota ainda.",
-  "empty_list_subtitle": "Toque em \"+\" para criar uma nota."
+  "empty_list_subtitle": "Toque em \"+\" para criar uma nota.",
+  "location_permission_denied": "Permissão de localização negada",
+  "location_error": "Não foi possível obter sua localização.",
+  "view_map": "Ver Localização"
 }
