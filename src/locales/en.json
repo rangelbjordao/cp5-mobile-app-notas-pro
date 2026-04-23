@@ -2,6 +2,7 @@
   "welcome": "Welcome",
   "login_sub": "Login to continue",
   "login_btn": "Login",
+  "email": "E-mail",
   "password": "Password",
   "register": "Sign Up",
   "link_signup": "Don't have an account? Sign up",
@@ -39,5 +40,7 @@
   "empty_list_subtitle": "Tap \"+\" to create a note.",
   "location_permission_denied": "Location permission denied",
   "location_error": "Could not get your location.",
-  "view_map": "View Location"
+  "view_map": "View Location",
+  "login_success_msg": "Great to have you back!",
+  "note_created_success": "Your note was saved successfully!"
 }

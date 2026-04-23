@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
@@ -22,11 +23,10 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MapaModal from "../src/components/MapaModal";
 import NotaModal from "../src/components/NotaModal";
 import { COLORS } from "../src/constants/colors";
 import { auth, db } from "../src/services/firebaseConfig";
-import MapaModal from "../src/components/MapaModal";
-import { Ionicons } from '@expo/vector-icons';
 
 type Nota = {
   id: string;
@@ -37,6 +37,7 @@ type Nota = {
 };
 
 const Home = () => {
+  const { t } = useTranslation()
   const [notas, setNotas] = useState<Nota[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -44,7 +45,6 @@ const Home = () => {
   const [mapaVisivel, setMapaVisivel] = useState(false);
 
   const router = useRouter();
-  const { t } = useTranslation()
   const { novoCadastro } = useLocalSearchParams();
 
   // Mensagem ao criar nova conta

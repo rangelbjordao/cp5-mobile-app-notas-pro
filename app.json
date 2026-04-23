@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rangel.cp5mobileappnotas"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,6 +24,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       }
     },
+    "useNextNotificationsApi": true,
     "web": {
       "favicon": "./assets/favicon.png"
     },

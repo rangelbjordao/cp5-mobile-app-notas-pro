@@ -22,6 +22,7 @@ import { auth, db } from "../services/firebaseConfig";
 import { COLORS } from "../constants/colors";
 import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
+import { enviarNotificacaoLocal } from "../services/notificationService";
 
 type Nota = {
   id: string;
@@ -104,6 +105,8 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
           uid: user.uid,
           criadoEm: serverTimestamp(),
         });
+
+        await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
       }
 
       onFechar();

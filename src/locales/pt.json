@@ -2,6 +2,7 @@
   "welcome": "Bem-vindo",
   "login_sub": "Faça login para continuar",
   "login_btn": "Entrar",
+  "email": "E-mail",
   "password": "Senha",
   "register": "Cadastrar-se",
   "link_signup": "Não tem conta? Criar agora",
@@ -39,5 +40,7 @@
   "empty_list_subtitle": "Toque em \"+\" para criar uma nota.",
   "location_permission_denied": "Permissão de localização negada",
   "location_error": "Não foi possível obter sua localização.",
-  "view_map": "Ver Localização"
+  "view_map": "Ver Localização",
+  "login_success_msg": "Que bom ter você de volta!",
+  "note_created_success": "Sua nota foi salva com sucesso!"
 }

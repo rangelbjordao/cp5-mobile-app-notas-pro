@@ -15,6 +15,7 @@ import { auth } from "../src/services/firebaseConfig";
 import { registrarUltimoLogin } from "../src/services/userDataService";
 import { COLORS } from "../src/constants/colors";
 import { useTranslation } from "react-i18next";
+import { enviarNotificacaoLocal } from "../src/services/notificationService";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -54,6 +55,8 @@ const LoginScreen = () => {
 
         //Salvando o usuário no AsyncStorage
         await AsyncStorage.setItem("@user", JSON.stringify(user));
+
+        await enviarNotificacaoLocal(t("welcome"), t("login_success_msg"));
         //Redericionar para a tela home
         router.replace("/Home");
       })
@@ -82,7 +85,7 @@ const LoginScreen = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="E-mail"
+          placeholder={t("email")}
           placeholderTextColor={COLORS.placeholder}
           keyboardType="email-address"
           autoCapitalize="none"
