@@ -57,5 +57,6 @@
   "reminder_body": "Don't forget your note",
   "reminder_invalid_date": "Choose a future date and time.",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "ok": "OK"
 }

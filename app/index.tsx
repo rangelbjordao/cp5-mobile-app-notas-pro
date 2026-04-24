@@ -67,7 +67,7 @@ const LoginScreen = () => {
         Alert.alert(
           t("attention"),
           t("invalid_credentials"),
-          [{ text: "OK" }],
+          [{ text: t("ok") }],
         );
       });
   };

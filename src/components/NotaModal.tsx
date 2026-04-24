@@ -114,9 +114,20 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
     }
 
     setSalvando(true);
+
     try {
       const user = auth.currentUser;
       if (!user) return;
+
+      if (editando && notaExistente) {
+        await updateDoc(doc(db, "notas", notaExistente.id), {
+          titulo: titulo.trim(),
+          conteudo: conteudo.trim(),
+        });
+
+        onFechar();
+        return;
+      }
 
       let localizacao = null;
 
@@ -138,7 +149,8 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
               {
                 text: t("allow"),
                 onPress: async () => {
-                  const { status } = await Location.requestForegroundPermissionsAsync();
+                  const { status } =
+                    await Location.requestForegroundPermissionsAsync();
                   resolve(status);
                 },
               },
@@ -187,36 +199,31 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
         conteudo: conteudo.trim(),
       };
 
-
       if (localizacao) {
         dadosNota.localizacao = localizacao;
       }
 
-      if (editando && notaExistente) {
-        await updateDoc(doc(db, "notas", notaExistente.id), dadosNota);
-      } else {
-        await addDoc(collection(db, "notas"), {
-          ...dadosNota,
-          uid: user.uid,
-          criadoEm: serverTimestamp(),
-          lembreteAtivo,
-          dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
-        });
+      await addDoc(collection(db, "notas"), {
+        ...dadosNota,
+        uid: user.uid,
+        criadoEm: serverTimestamp(),
+        lembreteAtivo,
+        dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
+      });
 
-        await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
+      await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
 
-        if (lembreteAtivo) {
-          const agora = new Date();
+      if (lembreteAtivo) {
+        const agora = new Date();
 
-          if (dataLembrete > agora) {
-            await agendarNotificacaoLembrete(
-              t("reminder_title"),
-              `${t("reminder_body")}: ${titulo.trim()}`,
-              dataLembrete
-            );
-          } else {
-            Alert.alert(t("attention"), t("reminder_invalid_date"));
-          }
+        if (dataLembrete > agora) {
+          await agendarNotificacaoLembrete(
+            t("reminder_title"),
+            `${t("reminder_body")}: ${titulo.trim()}`,
+            dataLembrete
+          );
+        } else {
+          Alert.alert(t("attention"), t("reminder_invalid_date"));
         }
       }
 
