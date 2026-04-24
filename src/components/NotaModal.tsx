@@ -74,26 +74,32 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
       let localizacao = null;
 
-      const status = await new Promise<string>((resolve) => {
-        Alert.alert(
-          t("location_permission_title"),
-          t("location_permission_message"),
-          [
-            {
-              text: t("deny"),
-              style: "cancel",
-              onPress: () => resolve("denied"),
-            },
-            {
-              text: t("allow"),
-              onPress: async () => {
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                resolve(status);
+      const permissaoAtual = await Location.getForegroundPermissionsAsync();
+
+      let status = permissaoAtual.status;
+
+      if (status !== "granted") {
+        status = await new Promise<Location.PermissionStatus>((resolve) => {
+          Alert.alert(
+            t("location_permission_title"),
+            t("location_permission_message"),
+            [
+              {
+                text: t("deny"),
+                style: "cancel",
+                onPress: () => resolve(Location.PermissionStatus.DENIED),
               },
-            },
-          ]
-        );
-      });
+              {
+                text: t("allow"),
+                onPress: async () => {
+                  const { status } = await Location.requestForegroundPermissionsAsync();
+                  resolve(status);
+                },
+              },
+            ]
+          );
+        });
+      }
 
       if (status === "granted") {
         try {

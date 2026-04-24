@@ -12,6 +12,37 @@ Notifications.setNotificationHandler({
   }),
 });
 
+export const solicitarPermissaoNotificacao = async () => {
+  const { status } = await Notifications.getPermissionsAsync();
+
+  if (status === "granted") {
+    return true;
+  }
+
+  return new Promise<boolean>((resolve) => {
+    Alert.alert(
+      i18n.t("notif_permission_title"),
+      i18n.t("notif_permission_message"),
+      [
+        {
+          text: i18n.t("deny"),
+          style: "cancel",
+          onPress: () => resolve(false),
+        },
+        {
+          text: i18n.t("allow"),
+          onPress: async () => {
+            const { status: novoStatus } =
+              await Notifications.requestPermissionsAsync();
+
+            resolve(novoStatus === "granted");
+          },
+        },
+      ],
+    );
+  });
+};
+
 export const enviarNotificacaoLocal = async (titulo: string, corpo: string) => {
   try {
     const permitido = await solicitarPermissaoNotificacao();
@@ -28,27 +59,4 @@ export const enviarNotificacaoLocal = async (titulo: string, corpo: string) => {
   } catch (error) {
     console.log("Erro ao disparar notificação local:", error);
   }
-};
-
-export const solicitarPermissaoNotificacao = async () => {
-  return new Promise<boolean>((resolve) => {
-    Alert.alert(
-      i18n.t("notif_permission_title"),
-      i18n.t("notif_permission_message"),
-      [
-        {
-          text: i18n.t("deny"),
-          style: "cancel",
-          onPress: () => resolve(false),
-        },
-        {
-          text: i18n.t("allow"),
-          onPress: async () => {
-            const { status } = await Notifications.requestPermissionsAsync();
-            resolve(status === "granted");
-          },
-        },
-      ],
-    );
-  });
 };
