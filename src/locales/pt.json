@@ -48,5 +48,14 @@
   "location_permission_title": "Permissão de Localização",
   "location_permission_message": "Precisamos acessar sua localização para salvar onde a nota foi criada.",
   "allow": "Permitir",
-  "deny": "Cancelar"
+  "deny": "Cancelar",
+  "reminder_enable": "Agendar lembrete",
+  "reminder_selected": "Lembrete selecionado",
+  "reminder_date": "Escolher data",
+  "reminder_time": "Escolher hora",
+  "reminder_title": "Lembrete de nota",
+  "reminder_body": "Não esqueça da sua nota",
+  "reminder_invalid_date": "Escolha uma data e horário futuros.",
+  "yes": "Sim",
+  "no": "Não"
 }

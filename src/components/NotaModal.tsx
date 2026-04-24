@@ -22,7 +22,11 @@ import { auth, db } from "../services/firebaseConfig";
 import { COLORS } from "../constants/colors";
 import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
-import { enviarNotificacaoLocal } from "../services/notificationService";
+import {
+  enviarNotificacaoLocal,
+  agendarNotificacaoLembrete,
+} from "../services/notificationService";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 type Nota = {
   id: string;
@@ -46,6 +50,10 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
   const [titulo, setTitulo] = useState("");
   const [conteudo, setConteudo] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [lembreteAtivo, setLembreteAtivo] = useState(false);
+  const [dataLembrete, setDataLembrete] = useState(new Date());
+  const [mostrarDatePicker, setMostrarDatePicker] = useState(false);
+  const [mostrarTimePicker, setMostrarTimePicker] = useState(false);
 
   const { t } = useTranslation();
 
@@ -55,11 +63,49 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
     if (notaExistente) {
       setTitulo(notaExistente.titulo);
       setConteudo(notaExistente.conteudo);
+      setLembreteAtivo(false);
+      setDataLembrete(new Date());
+      setMostrarDatePicker(false);
+      setMostrarTimePicker(false);
     } else {
       setTitulo("");
       setConteudo("");
     }
   }, [notaExistente, visivel]);
+
+  const formatarDataHora = (data: Date) => {
+    return data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const alterarDataLembrete = (_event: any, selectedDate?: Date) => {
+    setMostrarDatePicker(false);
+
+    if (selectedDate) {
+      const novaData = new Date(dataLembrete);
+      novaData.setFullYear(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate()
+      );
+      setDataLembrete(novaData);
+    }
+  };
+
+  const alterarHoraLembrete = (_event: any, selectedDate?: Date) => {
+    setMostrarTimePicker(false);
+
+    if (selectedDate) {
+      const novaData = new Date(dataLembrete);
+      novaData.setHours(selectedDate.getHours(), selectedDate.getMinutes(), 0, 0);
+      setDataLembrete(novaData);
+    }
+  };
 
   const handleSalvar = async () => {
     if (!titulo.trim()) {
@@ -153,9 +199,25 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
           ...dadosNota,
           uid: user.uid,
           criadoEm: serverTimestamp(),
+          lembreteAtivo,
+          dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
         });
 
         await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
+
+        if (lembreteAtivo) {
+          const agora = new Date();
+
+          if (dataLembrete > agora) {
+            await agendarNotificacaoLembrete(
+              t("reminder_title"),
+              `${t("reminder_body")}: ${titulo.trim()}`,
+              dataLembrete
+            );
+          } else {
+            Alert.alert(t("attention"), t("reminder_invalid_date"));
+          }
+        }
       }
 
       onFechar();
@@ -208,6 +270,61 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
             multiline
             textAlignVertical="top"
           />
+
+          <View style={styles.lembreteBox}>
+            <TouchableOpacity
+              style={styles.lembreteLinha}
+              onPress={() => setLembreteAtivo(!lembreteAtivo)}
+            >
+              <Text style={styles.lembreteTitulo}>{t("reminder_enable")}</Text>
+              <Text style={styles.lembreteStatus}>
+                {lembreteAtivo ? t("yes") : t("no")}
+              </Text>
+            </TouchableOpacity>
+
+            {lembreteAtivo && (
+              <>
+                <Text style={styles.lembreteDataTexto}>
+                  {t("reminder_selected")}: {formatarDataHora(dataLembrete)}
+                </Text>
+
+                <View style={styles.lembreteBotoes}>
+                  <TouchableOpacity
+                    style={styles.lembreteBotao}
+                    onPress={() => setMostrarDatePicker(true)}
+                  >
+                    <Text style={styles.lembreteBotaoTexto}>{t("reminder_date")}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.lembreteBotao}
+                    onPress={() => setMostrarTimePicker(true)}
+                  >
+                    <Text style={styles.lembreteBotaoTexto}>{t("reminder_time")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+
+            {mostrarDatePicker && (
+              <DateTimePicker
+                value={dataLembrete}
+                mode="date"
+                display="default"
+                minimumDate={new Date()}
+                onChange={alterarDataLembrete}
+              />
+            )}
+
+            {mostrarTimePicker && (
+              <DateTimePicker
+                value={dataLembrete}
+                mode="time"
+                display="default"
+                onChange={alterarHoraLembrete}
+              />
+            )}
+          </View>
 
           <TouchableOpacity
             style={styles.botao}
@@ -286,5 +403,50 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  lembreteBox: {
+    marginBottom: 14,
+  },
+  lembreteLinha: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  lembreteTitulo: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.texto,
+  },
+  lembreteStatus: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+  lembreteDataTexto: {
+    marginTop: 10,
+    fontSize: 13,
+    color: COLORS.subtitulo,
+  },
+  lembreteBotoes: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 10,
+  },
+  lembreteBotao: {
+    flex: 1,
+    backgroundColor: COLORS.primary,
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  lembreteBotaoTexto: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 13,
   },
 });

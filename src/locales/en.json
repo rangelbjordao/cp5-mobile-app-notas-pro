@@ -48,5 +48,14 @@
   "location_permission_title": "Location Permission",
   "location_permission_message": "We need your location to save where the note was created.",
   "allow": "Allow",
-  "deny": "Cancel"
+  "deny": "Cancel",
+  "reminder_enable": "Schedule reminder",
+  "reminder_selected": "Selected reminder",
+  "reminder_date": "Choose date",
+  "reminder_time": "Choose time",
+  "reminder_title": "Note reminder",
+  "reminder_body": "Don't forget your note",
+  "reminder_invalid_date": "Choose a future date and time.",
+  "yes": "Yes",
+  "no": "No"
 }
