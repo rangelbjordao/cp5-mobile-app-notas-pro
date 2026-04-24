@@ -23,7 +23,12 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.rangel.cp5mobileappnotas"
+      "package": "com.rangel.cp5mobileappnotas",
+      "config": {
+        "googleMaps": {
+          "apiKey": "SUA_CHAVE_GOOGLE_MAPS_AQUI"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,8 +41,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "60434fb8-0e5a-4a3a-9c37-ebd821c3579b"
+        "projectId": "f74cf300-957f-46e1-8d6d-314263e47ab3"
       }
-    }
+    },
+    "owner": "rangelbjordao13"
   }
 }

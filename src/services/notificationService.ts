@@ -30,7 +30,7 @@ export const solicitarPermissaoNotificacao = async () => {
           onPress: () => resolve(false),
         },
         {
-          text: i18n.t("allow"),
+          text: i18n.t("ok"),
           onPress: async () => {
             const { status: novoStatus } =
               await Notifications.requestPermissionsAsync();
