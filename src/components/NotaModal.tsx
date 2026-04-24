@@ -27,6 +27,7 @@ import {
   agendarNotificacaoLembrete,
 } from "../services/notificationService";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Notifications from "expo-notifications";
 
 type Nota = {
   id: string;
@@ -38,6 +39,9 @@ type Nota = {
     endereco?: string;
   };
   criadoEm: any;
+  lembreteAtivo?: boolean;
+  dataLembrete?: string | null;
+  notificacaoLembreteId?: string | null;
 };
 
 type Props = {
@@ -63,13 +67,19 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
     if (notaExistente) {
       setTitulo(notaExistente.titulo);
       setConteudo(notaExistente.conteudo);
-      setLembreteAtivo(false);
-      setDataLembrete(new Date());
+      setLembreteAtivo(!!notaExistente.lembreteAtivo);
+      setDataLembrete(
+        notaExistente.dataLembrete ? new Date(notaExistente.dataLembrete) : new Date()
+      );
       setMostrarDatePicker(false);
       setMostrarTimePicker(false);
     } else {
       setTitulo("");
       setConteudo("");
+      setLembreteAtivo(false);
+      setDataLembrete(new Date());
+      setMostrarDatePicker(false);
+      setMostrarTimePicker(false);
     }
   }, [notaExistente, visivel]);
 
@@ -120,9 +130,35 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
       if (!user) return;
 
       if (editando && notaExistente) {
+        if (notaExistente.notificacaoLembreteId) {
+          await Notifications.cancelScheduledNotificationAsync(
+            notaExistente.notificacaoLembreteId
+          );
+        }
+
+        let novaNotificacaoLembreteId: string | null = null;
+
+        if (lembreteAtivo) {
+          const agora = new Date();
+
+          if (dataLembrete > agora) {
+            novaNotificacaoLembreteId = await agendarNotificacaoLembrete(
+              t("reminder_title"),
+              `${t("reminder_body")}: ${titulo.trim()}`,
+              dataLembrete
+            );
+          } else {
+            Alert.alert(t("attention"), t("reminder_invalid_date"));
+            return;
+          }
+        }
+
         await updateDoc(doc(db, "notas", notaExistente.id), {
           titulo: titulo.trim(),
           conteudo: conteudo.trim(),
+          lembreteAtivo,
+          dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
+          notificacaoLembreteId: novaNotificacaoLembreteId,
         });
 
         onFechar();
@@ -203,29 +239,33 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
         dadosNota.localizacao = localizacao;
       }
 
-      await addDoc(collection(db, "notas"), {
-        ...dadosNota,
-        uid: user.uid,
-        criadoEm: serverTimestamp(),
-        lembreteAtivo,
-        dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
-      });
-
-      await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
+      let notificacaoLembreteId: string | null = null;
 
       if (lembreteAtivo) {
         const agora = new Date();
 
         if (dataLembrete > agora) {
-          await agendarNotificacaoLembrete(
+          notificacaoLembreteId = await agendarNotificacaoLembrete(
             t("reminder_title"),
             `${t("reminder_body")}: ${titulo.trim()}`,
             dataLembrete
           );
         } else {
           Alert.alert(t("attention"), t("reminder_invalid_date"));
+          return;
         }
       }
+
+      await addDoc(collection(db, "notas"), {
+        ...dadosNota,
+        uid: user.uid,
+        criadoEm: serverTimestamp(),
+        lembreteAtivo,
+        dataLembrete: lembreteAtivo ? dataLembrete.toISOString() : null,
+        notificacaoLembreteId,
+      });
+
+      await enviarNotificacaoLocal(t("modal_new"), t("note_created_success"));
 
       onFechar();
     } catch (error) {

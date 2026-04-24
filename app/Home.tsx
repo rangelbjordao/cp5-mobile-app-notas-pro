@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -50,6 +51,12 @@ const Home = () => {
 
   const router = useRouter();
   const { novoCadastro } = useLocalSearchParams();
+
+  const { i18n } = useTranslation();
+
+  const mudarIdioma = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
 
   // Mensagem ao criar nova conta
   useEffect(() => {
@@ -165,9 +172,38 @@ const Home = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.titulo}>{t("home_title")}</Text>
-        <TouchableOpacity onPress={realizarLogout}>
-          <Text style={styles.logout}>{t("logout")}</Text>
-        </TouchableOpacity>
+
+        <View style={styles.headerRight}>
+          <View style={styles.idiomaContainer}>
+            <TouchableOpacity onPress={() => mudarIdioma("pt")}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <Text style={i18n.language === "pt" ? styles.langActive : styles.langInactive}>
+                  PT
+                </Text>
+                <Image
+                  source={require("../assets/brasil.png")}
+                  style={{ width: 24, height: 24 }}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => mudarIdioma("en")}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <Text style={i18n.language === "en" ? styles.langActive : styles.langInactive}>
+                  EN
+                </Text>
+                <Image
+                  source={require("../assets/usa.png")}
+                  style={{ width: 24, height: 24 }}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.logoutBotao} onPress={realizarLogout}>
+            <Text style={styles.logout}>{t("logout")}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading ? (
@@ -232,6 +268,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 24,
   },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 12,
+    minWidth: 150,
+  },
   titulo: {
     fontSize: 24,
     fontWeight: "700",
@@ -247,6 +290,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: COLORS.primary,
     fontWeight: "600",
+  },
+  logoutBotao: {
+    minWidth: 55,
+    alignItems: "flex-end",
   },
   card: {
     backgroundColor: COLORS.card,
@@ -320,18 +367,19 @@ const styles = StyleSheet.create({
   },
   idiomaContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    gap: 20,
-    marginTop: 20,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 10,
+    minWidth: 90,
   },
   langActive: {
     fontWeight: "bold",
     color: COLORS.primary,
-    fontSize: 16,
+    fontSize: 14,
   },
   langInactive: {
     color: COLORS.subtitulo,
-    fontSize: 16,
+    fontSize: 14,
   },
   localizacaoBotao: {
     marginTop: 8,

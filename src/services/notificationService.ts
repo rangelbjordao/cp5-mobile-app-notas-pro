@@ -65,13 +65,13 @@ export const agendarNotificacaoLembrete = async (
   titulo: string,
   corpo: string,
   data: Date,
-) => {
+): Promise<string | null> => {
   try {
     const permitido = await solicitarPermissaoNotificacao();
 
-    if (!permitido) return;
+    if (!permitido) return null;
 
-    await Notifications.scheduleNotificationAsync({
+    const notificacaoId = await Notifications.scheduleNotificationAsync({
       content: {
         title: titulo,
         body: corpo,
@@ -81,7 +81,10 @@ export const agendarNotificacaoLembrete = async (
         date: data,
       },
     });
+
+    return notificacaoId;
   } catch (error) {
     console.log("Erro ao agendar notificação:", error);
+    return null;
   }
 };
