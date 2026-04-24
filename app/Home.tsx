@@ -32,7 +32,11 @@ type Nota = {
   id: string;
   titulo: string;
   conteudo: string;
-  localizacao?: { latitude: number; longitude: number };
+  localizacao?: {
+    latitude: number;
+    longitude: number;
+    endereco?: string;
+  };
   criadoEm: any;
 };
 
@@ -129,6 +133,12 @@ const Home = () => {
         <Text style={styles.cardConteudo} numberOfLines={2}>
           {item.conteudo}
         </Text>
+
+        {item.localizacao?.endereco && (
+          <Text style={styles.enderecoTexto} numberOfLines={1}>
+            {item.localizacao.endereco}
+          </Text>
+        )}
 
         {item.localizacao && (
           <TouchableOpacity
@@ -334,5 +344,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginLeft: 4,
-  }
+  },
+  enderecoTexto: {
+    marginTop: 6,
+    fontSize: 12,
+    color: COLORS.subtitulo,
+  },
 });

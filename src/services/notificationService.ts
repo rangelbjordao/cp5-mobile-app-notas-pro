@@ -1,4 +1,6 @@
 import * as Notifications from "expo-notifications";
+import { Alert } from "react-native";
+import i18n from "./i18n";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -29,17 +31,24 @@ export const enviarNotificacaoLocal = async (titulo: string, corpo: string) => {
 };
 
 export const solicitarPermissaoNotificacao = async () => {
-  const { status } = await Notifications.getPermissionsAsync();
-
-  if (status !== "granted") {
-    const { status: novoStatus } =
-      await Notifications.requestPermissionsAsync();
-
-    if (novoStatus !== "granted") {
-      console.log("Permissão de notificação negada");
-      return false;
-    }
-  }
-
-  return true;
+  return new Promise<boolean>((resolve) => {
+    Alert.alert(
+      i18n.t("notif_permission_title"),
+      i18n.t("notif_permission_message"),
+      [
+        {
+          text: i18n.t("deny"),
+          style: "cancel",
+          onPress: () => resolve(false),
+        },
+        {
+          text: i18n.t("allow"),
+          onPress: async () => {
+            const { status } = await Notifications.requestPermissionsAsync();
+            resolve(status === "granted");
+          },
+        },
+      ],
+    );
+  });
 };

@@ -42,5 +42,11 @@
   "location_error": "Não foi possível obter sua localização.",
   "view_map": "Ver Localização",
   "login_success_msg": "Que bom ter você de volta!",
-  "note_created_success": "Sua nota foi salva com sucesso!"
+  "note_created_success": "Sua nota foi salva com sucesso!",
+  "notif_permission_title": "Permissão de Notificação",
+  "notif_permission_message": "Precisamos enviar notificações para avisar sobre login e criação de notas.",
+  "location_permission_title": "Permissão de Localização",
+  "location_permission_message": "Precisamos acessar sua localização para salvar onde a nota foi criada.",
+  "allow": "Permitir",
+  "deny": "Cancelar"
 }

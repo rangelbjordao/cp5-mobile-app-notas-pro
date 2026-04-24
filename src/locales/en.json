@@ -42,5 +42,11 @@
   "location_error": "Could not get your location.",
   "view_map": "View Location",
   "login_success_msg": "Great to have you back!",
-  "note_created_success": "Your note was saved successfully!"
+  "note_created_success": "Your note was saved successfully!",
+  "notif_permission_title": "Notification Permission",
+  "notif_permission_message": "We need to send notifications to inform you about login and note creation.",
+  "location_permission_title": "Location Permission",
+  "location_permission_message": "We need your location to save where the note was created.",
+  "allow": "Allow",
+  "deny": "Cancel"
 }

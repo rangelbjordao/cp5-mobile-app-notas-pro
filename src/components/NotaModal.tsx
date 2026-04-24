@@ -28,7 +28,11 @@ type Nota = {
   id: string;
   titulo: string;
   conteudo: string;
-  localizacao?: { latitude: number; longitude: number };
+  localizacao?: {
+    latitude: number;
+    longitude: number;
+    endereco?: string;
+  };
   criadoEm: any;
 };
 
@@ -70,14 +74,53 @@ const NotaModal = ({ visivel, onFechar, notaExistente }: Props) => {
 
       let localizacao = null;
 
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const status = await new Promise<string>((resolve) => {
+        Alert.alert(
+          t("location_permission_title"),
+          t("location_permission_message"),
+          [
+            {
+              text: t("deny"),
+              style: "cancel",
+              onPress: () => resolve("denied"),
+            },
+            {
+              text: t("allow"),
+              onPress: async () => {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                resolve(status);
+              },
+            },
+          ]
+        );
+      });
 
       if (status === "granted") {
         try {
           const location = await Location.getCurrentPositionAsync({});
+
+          const enderecoResultado = await Location.reverseGeocodeAsync({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+
+          const endereco = enderecoResultado[0];
+
+          const enderecoFormatado = endereco
+            ? [
+              endereco.street,
+              endereco.district,
+              endereco.city || endereco.subregion,
+              endereco.region,
+            ]
+              .filter(Boolean)
+              .join(", ")
+            : "";
+
           localizacao = {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
+            endereco: enderecoFormatado,
           };
         } catch (err) {
           console.log("Erro ao obter posição", err);
