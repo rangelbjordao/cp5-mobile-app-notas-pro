@@ -19,6 +19,14 @@ O app permite que usuários se cadastrem, façam login e gerenciem suas própria
 - Notas salvas por usuário no Firestore
 - Confirmação antes de deletar uma nota
 - Persistência de sessão com AsyncStorage
+- Internacionalização com suporte a Português e Inglês
+- Seletor interno para troca de idioma
+- Captura automática de latitude e longitude ao criar uma nota
+- Armazenamento das coordenadas da nota no Firestore
+- Exibição de mapa com marcador indicando o local onde a nota foi criada
+- Conversão das coordenadas em endereço aproximado usando geocoding reverso
+- Integração com Expo Notifications
+- Agendamento de lembrete para uma nota em data e hora específicas
 
 ## Tecnologias Utilizadas
 
@@ -29,6 +37,13 @@ O app permite que usuários se cadastrem, façam login e gerenciem suas própria
 - Firestore
 - Expo Router
 - AsyncStorage
+- i18next
+- Expo Localization
+- Expo Location
+- React Native Maps
+- Expo Notifications
+- React Native DateTimePicker
+- EAS Build
 
 ## Como Rodar o Projeto
 
@@ -57,6 +72,34 @@ npm install
 npx expo start
 ```
 
+## Build Android
+
+### Google Maps API Key
+
+Para gerar um novo APK com o mapa funcionando, é necessário configurar uma chave do Google Maps no `app.json`, no campo `android.config.googleMaps.apiKey`.
+
+A chave precisa ter o **Maps SDK for Android** ativado no Google Cloud.
+
+O projeto está configurado para geração de build Android pelo EAS Build.
+
+Para gerar o APK, utilize:
+
+```bash
+npx eas build --platform android --profile preview
+```
+
+## APK
+
+O APK gerado para instalação em dispositivos Android está disponível no link abaixo:
+
+Link para instalação:
+
+[Baixar APK pelo Expo](https://expo.dev/accounts/rangelbjordao13/projects/cp5-mobile-app-notas/builds/0a2313fd-0f7e-4478-be17-ebd21ce0ef52)
+
+Link alternativo pelo Google Drive:
+
+[Baixar APK pelo Google Drive](https://drive.google.com/file/d/1rkeG_VsYY6Z8_L5I-OATlrCB8rkvhxPx/view?usp=sharing)
+
 ## Vídeo de Demonstração
 
-[Clique aqui para assistir](https://www.youtube.com/watch?v=zwx8dYWfXUI)
+[Clique aqui para assistir](https://youtu.be/XZR4jIx3p0c)
